@@ -1,0 +1,1194 @@
+mode: rule
+log-level: info
+ipv6: true
+profile:
+  store-selected: true
+  store-fake-ip: true
+proxy-providers:
+  SSDOG:
+    type: http
+    url: https://e2821e3fbb9363e023bc8872c79ac45f.z7pm-k4ra-9vqd-xc3t-bl6s.sbs/s?q=27a62a3a&t=e2821e3fbb9363e023bc8872c79ac45f.jpg
+    path: ./proxy_providers/ssdog-projectclash.yaml
+    interval: 3600
+    proxy: DIRECT
+    exclude-filter: (?i)(剩余|剩餘|流量|到期|过期|過期|有效期|订阅|訂閱|官网|官網|套餐|重置|Traffic|Expire|Reset|Bandwidth)
+    exclude-type: direct|reject|reject-drop|pass|dns|compatible
+    health-check:
+      enable: true
+      url: https://www.gstatic.com/generate_204
+      interval: 600
+      lazy: true
+      expected-status: 204
+dns:
+  enable: true
+  ipv6: false
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter:
+    - +.localhost
+    - +.local
+    - +.lan
+    - +.home.arpa
+  default-nameserver:
+    - https://223.5.5.5/dns-query
+  proxy-server-nameserver:
+    - https://223.5.5.5/dns-query
+  direct-nameserver:
+    - https://223.5.5.5/dns-query
+  direct-nameserver-follow-policy: true
+  nameserver:
+    - https://1.1.1.1/dns-query#US-AI
+  nameserver-policy:
+    lf3-static.bytednsdoc.com: https://223.5.5.5/dns-query
+    v5-dy-o-abtest.zjcdn.com: https://223.5.5.5/dns-query
+    +.amemv.com: https://223.5.5.5/dns-query
+    +.amemv.net: https://223.5.5.5/dns-query
+    +.amemv.cn: https://223.5.5.5/dns-query
+    +.douyinstatic.com: https://223.5.5.5/dns-query
+    +.idouyinpic.com: https://223.5.5.5/dns-query
+    +.idouyinstatic.com: https://223.5.5.5/dns-query
+    +.idouyinvod.com: https://223.5.5.5/dns-query
+    +.iesdouyin.net: https://223.5.5.5/dns-query
+    +.pstatp.com: https://223.5.5.5/dns-query
+    +.zijieapi.com: https://223.5.5.5/dns-query
+    +.zijieimg.com: https://223.5.5.5/dns-query
+    +.douyin.com: https://223.5.5.5/dns-query
+    +.douyinpic.com: https://223.5.5.5/dns-query
+    +.douyinvod.com: https://223.5.5.5/dns-query
+    +.douyincdn.com: https://223.5.5.5/dns-query
+    +.iesdouyin.com: https://223.5.5.5/dns-query
+    +.snssdk.com: https://223.5.5.5/dns-query
+    +.bytedance.com: https://223.5.5.5/dns-query
+    +.byteimg.com: https://223.5.5.5/dns-query
+    +.bytegoofy.com: https://223.5.5.5/dns-query
+    +.cn: https://223.5.5.5/dns-query
+    +.apple.com.cn: https://1.1.1.1/dns-query#US-AI
+    +.apple.cn: https://1.1.1.1/dns-query#US-AI
+    +.icloud.com.cn: https://1.1.1.1/dns-query#US-AI
+    +.icloud.cn: https://1.1.1.1/dns-query#US-AI
+    +.localhost: system
+    +.lan: system
+    +.local: system
+    +.home.arpa: system
+proxy-groups:
+  - name: US-AI
+    type: fallback
+    use:
+      - SSDOG
+    filter: "(?i)(?:\U0001F1FA\U0001F1F8|美国|美國|美西|美东|美東|洛杉矶|洛杉磯|圣何塞|聖荷西|西雅图|西雅圖|纽约|紐約|(?:^|[^a-z])(?:United[ _-]*States(?: of America)?|US(?:A)?|Los Angeles|San Jose|Seattle|New York|Dallas|Chicago|Miami|Atlanta|Silicon Valley)(?:$|[^a-z]))"
+    empty-fallback: REJECT
+  - name: Apple-Services
+    type: fallback
+    proxies:
+      - US-AI
+  - name: ChatGPT
+    type: url-test
+    proxies:
+      - US-AI
+  - name: Claude
+    type: select
+    proxies:
+      - US-AI
+  - name: Gemini
+    type: select
+    proxies:
+      - US-AI
+  - name: Copilot
+    type: select
+    proxies:
+      - US-AI
+  - name: 其他 AI
+    type: url-test
+    proxies:
+      - US-AI
+  - name: Overseas
+    type: select
+    proxies:
+      - Auto
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+      - 所有节点
+  - name: Auto
+    type: url-test
+    use:
+      - SSDOG
+    url: https://www.gstatic.com/generate_204
+    interval: 600
+    tolerance: 80
+    lazy: true
+    empty-fallback: REJECT
+  - name: 所有节点
+    type: select
+    use:
+      - SSDOG
+    empty-fallback: REJECT
+  - name: 美国
+    type: select
+    use:
+      - SSDOG
+    filter: "(?i)(?:\U0001F1FA\U0001F1F8|美国|美國|美西|美东|美東|洛杉矶|洛杉磯|圣何塞|聖荷西|西雅图|西雅圖|纽约|紐約|(?:^|[^a-z])(?:United[ _-]*States(?: of America)?|US(?:A)?|Los Angeles|San Jose|Seattle|New York|Dallas|Chicago|Miami|Atlanta|Silicon Valley)(?:$|[^a-z]))"
+    empty-fallback: REJECT
+  - name: 日本
+    type: select
+    use:
+      - SSDOG
+    filter: "(?i)(?:\U0001F1EF\U0001F1F5|日本|东京|東京|大阪|埼玉|(?:^|[^a-z])(?:Japan|JP(?:N)?|Tokyo|Osaka|Saitama)(?:$|[^a-z]))"
+    empty-fallback: REJECT
+  - name: 新加坡
+    type: select
+    use:
+      - SSDOG
+    filter: "(?i)(?:\U0001F1F8\U0001F1EC|新加坡|狮城|獅城|(?:^|[^a-z])(?:Singapore|SG(?:P)?)(?:$|[^a-z]))"
+    empty-fallback: REJECT
+  - name: 台湾
+    type: select
+    use:
+      - SSDOG
+    filter: "(?i)(?:\U0001F1F9\U0001F1FC|台湾|台灣|臺灣|台北|臺北|新北|高雄|(?:^|[^a-z])(?:Taiwan|TW(?:N)?|Taipei|Kaohsiung)(?:$|[^a-z]))"
+    empty-fallback: REJECT
+  - name: 香港
+    type: select
+    use:
+      - SSDOG
+    filter: "(?i)(?:\U0001F1ED\U0001F1F0|香港|港岛|港島|(?:^|[^a-z])(?:Hong[ _-]*Kong|HK(?:G)?)(?:$|[^a-z]))"
+    empty-fallback: REJECT
+  - name: 韩国
+    type: select
+    use:
+      - SSDOG
+    filter: "(?i)(?:\U0001F1F0\U0001F1F7|韩国|韓國|首尔|首爾|(?:^|[^a-z])(?:South[ _-]*Korea|Korea|KR|KOR|Seoul)(?:$|[^a-z]))"
+    empty-fallback: REJECT
+  - name: 英国
+    type: select
+    use:
+      - SSDOG
+    filter: "(?i)(?:\U0001F1EC\U0001F1E7|英国|英國|伦敦|倫敦|(?:^|[^a-z])(?:United[ _-]*Kingdom|UK|GB(?:R)?|London)(?:$|[^a-z]))"
+    empty-fallback: REJECT
+  - name: 德国
+    type: select
+    use:
+      - SSDOG
+    filter: "(?i)(?:\U0001F1E9\U0001F1EA|德国|德國|法兰克福|法蘭克福|(?:^|[^a-z])(?:Germany|DE(?:U)?|Frankfurt)(?:$|[^a-z]))"
+    empty-fallback: REJECT
+  - name: 加拿大
+    type: select
+    use:
+      - SSDOG
+    filter: "(?i)(?:\U0001F1E8\U0001F1E6|加拿大|多伦多|多倫多|温哥华|溫哥華|(?:^|[^a-z])(?:Canada|CAN|Toronto|Vancouver|Montreal)(?:$|[^a-z]))"
+    empty-fallback: REJECT
+  - name: 澳大利亚
+    type: select
+    use:
+      - SSDOG
+    filter: "(?i)(?:\U0001F1E6\U0001F1FA|澳大利亚|澳大利亞|澳洲|悉尼|雪梨|(?:^|[^a-z])(?:Australia|AU(?:S)?|Sydney|Melbourne)(?:$|[^a-z]))"
+    empty-fallback: REJECT
+  - name: 中国大陆
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: Final
+    type: select
+    proxies:
+      - Overseas
+      - DIRECT
+  - name: YouTube
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: Netflix
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: Disney+
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: Prime Video
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: HBO Max
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: Spotify
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: TikTok
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: Instagram
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: WhatsApp
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: Facebook
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: X
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: Telegram
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: Discord
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: Reddit
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: GitHub
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: Steam
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: PayPal
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: Microsoft
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: Google
+    type: select
+    proxies:
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 微信
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 腾讯视频
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: QQ
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 腾讯其他
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 支付宝
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 淘宝
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 京东
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 拼多多
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 抖音
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 快手
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 哔哩哔哩
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 小红书
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 微博
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 知乎
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 百度
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 网易
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 爱奇艺
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 优酷
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 芒果 TV
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 高德地图
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 美团
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 滴滴
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+  - name: 国内银行
+    type: select
+    proxies:
+      - DIRECT
+      - Overseas
+      - 美国
+      - 日本
+      - 新加坡
+      - 台湾
+      - 香港
+      - 韩国
+      - 英国
+      - 德国
+      - 加拿大
+      - 澳大利亚
+rules:
+  - DOMAIN,apple-relay.cloudflare.com,Apple-Services
+  - DOMAIN,apple-relay.fastly-edge.com,Apple-Services
+  - DOMAIN,cp4.cloudflare.com,Apple-Services
+  - DOMAIN,apple-relay.akamaized.net,Apple-Services
+  - DOMAIN-SUFFIX,apple.com,Apple-Services
+  - DOMAIN-SUFFIX,apple.com.cn,Apple-Services
+  - DOMAIN-SUFFIX,apple.cn,Apple-Services
+  - DOMAIN-SUFFIX,icloud.com,Apple-Services
+  - DOMAIN-SUFFIX,icloud.com.cn,Apple-Services
+  - DOMAIN-SUFFIX,icloud.cn,Apple-Services
+  - DOMAIN-SUFFIX,icloud-content.com,Apple-Services
+  - DOMAIN-SUFFIX,me.com,Apple-Services
+  - DOMAIN-SUFFIX,mac.com,Apple-Services
+  - DOMAIN-SUFFIX,mzstatic.com,Apple-Services
+  - DOMAIN-SUFFIX,cdn-apple.com,Apple-Services
+  - DOMAIN-SUFFIX,aaplimg.com,Apple-Services
+  - DOMAIN-SUFFIX,apple-dns.net,Apple-Services
+  - DOMAIN-SUFFIX,apple-mapkit.com,Apple-Services
+  - DOMAIN-SUFFIX,apple-cloudkit.com,Apple-Services
+  - DOMAIN-SUFFIX,apple.news,Apple-Services
+  - DOMAIN-SUFFIX,apple-card.com,Apple-Services
+  - DOMAIN-SUFFIX,apple-pay.com,Apple-Services
+  - DOMAIN-SUFFIX,applewallet.com,Apple-Services
+  - DOMAIN-SUFFIX,applemusic.com,Apple-Services
+  - DOMAIN-SUFFIX,appleid.com,Apple-Services
+  - DOMAIN-SUFFIX,itunes.com,Apple-Services
+  - DOMAIN-SUFFIX,apple,Apple-Services
+  - DOMAIN-SUFFIX,apple.com.akadns.net,Apple-Services
+  - DOMAIN-SUFFIX,itunes-apple.com.akadns.net,Apple-Services
+  - IP-CIDR,17.0.0.0/8,Apple-Services,no-resolve
+  - IP-CIDR6,2403:300::/32,Apple-Services,no-resolve
+  - IP-CIDR6,2620:149::/32,Apple-Services,no-resolve
+  - IP-CIDR6,2a01:b740::/32,Apple-Services,no-resolve
+  - DOMAIN-SUFFIX,openai.com,ChatGPT
+  - DOMAIN-SUFFIX,chatgpt.com,ChatGPT
+  - DOMAIN-SUFFIX,oaistatic.com,ChatGPT
+  - DOMAIN-SUFFIX,oaiusercontent.com,ChatGPT
+  - DOMAIN-SUFFIX,sora.com,ChatGPT
+  - DOMAIN-SUFFIX,chat.com,ChatGPT
+  - DOMAIN-SUFFIX,anthropic.com,Claude
+  - DOMAIN-SUFFIX,claude.ai,Claude
+  - DOMAIN-SUFFIX,claude.com,Claude
+  - DOMAIN-SUFFIX,claudeusercontent.com,Claude
+  - DOMAIN-SUFFIX,gemini.google.com,Gemini
+  - DOMAIN-SUFFIX,bard.google.com,Gemini
+  - DOMAIN-SUFFIX,aistudio.google.com,Gemini
+  - DOMAIN-SUFFIX,ai.google.dev,Gemini
+  - DOMAIN-SUFFIX,generativelanguage.googleapis.com,Gemini
+  - DOMAIN-SUFFIX,notebooklm.google.com,Gemini
+  - DOMAIN-SUFFIX,notebooklm.google,Gemini
+  - DOMAIN-SUFFIX,labs.google,Gemini
+  - DOMAIN-SUFFIX,stitch.withgoogle.com,Gemini
+  - DOMAIN-SUFFIX,aiplatform.googleapis.com,Gemini
+  - DOMAIN-SUFFIX,copilot.microsoft.com,Copilot
+  - DOMAIN-SUFFIX,copilot.cloud.microsoft,Copilot
+  - DOMAIN-SUFFIX,copilotstudio.microsoft.com,Copilot
+  - DOMAIN-SUFFIX,copilot.com,Copilot
+  - DOMAIN-SUFFIX,perplexity.ai,其他 AI
+  - DOMAIN-SUFFIX,pplx.ai,其他 AI
+  - DOMAIN-SUFFIX,grok.com,其他 AI
+  - DOMAIN-SUFFIX,x.ai,其他 AI
+  - DOMAIN-SUFFIX,poe.com,其他 AI
+  - DOMAIN-SUFFIX,openrouter.ai,其他 AI
+  - DOMAIN-SUFFIX,mistral.ai,其他 AI
+  - DOMAIN-SUFFIX,cursor.com,其他 AI
+  - DOMAIN-SUFFIX,cursor.sh,其他 AI
+  - DOMAIN-SUFFIX,cursorapi.com,其他 AI
+  - DOMAIN-SUFFIX,githubcopilot.com,其他 AI
+  - DOMAIN-SUFFIX,localhost,DIRECT
+  - DOMAIN-SUFFIX,local,DIRECT
+  - DOMAIN-SUFFIX,lan,DIRECT
+  - DOMAIN-SUFFIX,home.arpa,DIRECT
+  - IP-CIDR,0.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,224.0.0.0/4,DIRECT,no-resolve
+  - IP-CIDR,255.255.255.255/32,DIRECT,no-resolve
+  - IP-CIDR6,::1/128,DIRECT,no-resolve
+  - IP-CIDR6,fc00::/7,DIRECT,no-resolve
+  - IP-CIDR6,fe80::/10,DIRECT,no-resolve
+  - IP-CIDR6,ff00::/8,DIRECT,no-resolve
+  - DOMAIN-SUFFIX,youtube.com,YouTube
+  - DOMAIN-SUFFIX,youtube-nocookie.com,YouTube
+  - DOMAIN-SUFFIX,youtu.be,YouTube
+  - DOMAIN-SUFFIX,ytimg.com,YouTube
+  - DOMAIN-SUFFIX,googlevideo.com,YouTube
+  - DOMAIN-SUFFIX,youtubei.googleapis.com,YouTube
+  - DOMAIN-SUFFIX,youtube.googleapis.com,YouTube
+  - DOMAIN-SUFFIX,youtubekids.com,YouTube
+  - DOMAIN-SUFFIX,netflix.com,Netflix
+  - DOMAIN-SUFFIX,netflix.net,Netflix
+  - DOMAIN-SUFFIX,nflximg.com,Netflix
+  - DOMAIN-SUFFIX,nflximg.net,Netflix
+  - DOMAIN-SUFFIX,nflxvideo.net,Netflix
+  - DOMAIN-SUFFIX,nflxso.net,Netflix
+  - DOMAIN-SUFFIX,nflxext.com,Netflix
+  - DOMAIN-SUFFIX,fast.com,Netflix
+  - DOMAIN-SUFFIX,disneyplus.com,Disney+
+  - DOMAIN-SUFFIX,disney-plus.net,Disney+
+  - DOMAIN-SUFFIX,disneyplus.net,Disney+
+  - DOMAIN-SUFFIX,bamgrid.com,Disney+
+  - DOMAIN-SUFFIX,dssott.com,Disney+
+  - DOMAIN-SUFFIX,disneyplus.bn5x.net,Disney+
+  - DOMAIN-SUFFIX,primevideo.com,Prime Video
+  - DOMAIN-SUFFIX,amazonvideo.com,Prime Video
+  - DOMAIN-SUFFIX,aiv-cdn.net,Prime Video
+  - DOMAIN-SUFFIX,aiv-delivery.net,Prime Video
+  - DOMAIN-SUFFIX,primevideo.amazon.com,Prime Video
+  - DOMAIN-SUFFIX,pv-cdn.net,Prime Video
+  - DOMAIN-SUFFIX,hbomax.com,HBO Max
+  - DOMAIN-SUFFIX,hbo.com,HBO Max
+  - DOMAIN-SUFFIX,max.com,HBO Max
+  - DOMAIN-SUFFIX,hbomaxcdn.com,HBO Max
+  - DOMAIN-SUFFIX,hbonow.com,HBO Max
+  - DOMAIN-SUFFIX,spotify.com,Spotify
+  - DOMAIN-SUFFIX,spotifycdn.com,Spotify
+  - DOMAIN-SUFFIX,spotifycdn.net,Spotify
+  - DOMAIN-SUFFIX,scdn.co,Spotify
+  - DOMAIN-SUFFIX,tiktok.com,TikTok
+  - DOMAIN-SUFFIX,tiktokv.com,TikTok
+  - DOMAIN-SUFFIX,tiktokcdn.com,TikTok
+  - DOMAIN-SUFFIX,tiktokcdn-us.com,TikTok
+  - DOMAIN-SUFFIX,tiktokv.us,TikTok
+  - DOMAIN-SUFFIX,tiktokmusic.app,TikTok
+  - DOMAIN-SUFFIX,muscdn.com,TikTok
+  - DOMAIN-SUFFIX,musical.ly,TikTok
+  - DOMAIN-SUFFIX,instagram.com,Instagram
+  - DOMAIN-SUFFIX,cdninstagram.com,Instagram
+  - DOMAIN-SUFFIX,ig.me,Instagram
+  - DOMAIN-SUFFIX,whatsapp.com,WhatsApp
+  - DOMAIN-SUFFIX,whatsapp.net,WhatsApp
+  - DOMAIN-SUFFIX,wa.me,WhatsApp
+  - DOMAIN-SUFFIX,facebook.com,Facebook
+  - DOMAIN-SUFFIX,facebook.net,Facebook
+  - DOMAIN-SUFFIX,fbcdn.net,Facebook
+  - DOMAIN-SUFFIX,fb.com,Facebook
+  - DOMAIN-SUFFIX,fb.me,Facebook
+  - DOMAIN-SUFFIX,messenger.com,Facebook
+  - DOMAIN-SUFFIX,m.me,Facebook
+  - DOMAIN-SUFFIX,threads.net,Facebook
+  - DOMAIN-SUFFIX,threads.com,Facebook
+  - DOMAIN-SUFFIX,x.com,X
+  - DOMAIN-SUFFIX,twitter.com,X
+  - DOMAIN-SUFFIX,twimg.com,X
+  - DOMAIN-SUFFIX,t.co,X
+  - DOMAIN-SUFFIX,twittercdn.com,X
+  - DOMAIN-SUFFIX,telegram.org,Telegram
+  - DOMAIN-SUFFIX,telegram.me,Telegram
+  - DOMAIN-SUFFIX,t.me,Telegram
+  - DOMAIN-SUFFIX,telegra.ph,Telegram
+  - DOMAIN-SUFFIX,telegram.dog,Telegram
+  - DOMAIN-SUFFIX,tdesktop.com,Telegram
+  - DOMAIN-SUFFIX,telesco.pe,Telegram
+  - DOMAIN-SUFFIX,discord.com,Discord
+  - DOMAIN-SUFFIX,discord.gg,Discord
+  - DOMAIN-SUFFIX,discordapp.com,Discord
+  - DOMAIN-SUFFIX,discordapp.net,Discord
+  - DOMAIN-SUFFIX,discord.media,Discord
+  - DOMAIN-SUFFIX,discordcdn.com,Discord
+  - DOMAIN-SUFFIX,reddit.com,Reddit
+  - DOMAIN-SUFFIX,redd.it,Reddit
+  - DOMAIN-SUFFIX,redditmedia.com,Reddit
+  - DOMAIN-SUFFIX,redditstatic.com,Reddit
+  - DOMAIN-SUFFIX,redditinc.com,Reddit
+  - DOMAIN-SUFFIX,github.com,GitHub
+  - DOMAIN-SUFFIX,github.io,GitHub
+  - DOMAIN-SUFFIX,githubusercontent.com,GitHub
+  - DOMAIN-SUFFIX,githubassets.com,GitHub
+  - DOMAIN-SUFFIX,githubapp.com,GitHub
+  - DOMAIN-SUFFIX,github.dev,GitHub
+  - DOMAIN-SUFFIX,steampowered.com,Steam
+  - DOMAIN-SUFFIX,steamcommunity.com,Steam
+  - DOMAIN-SUFFIX,steamstatic.com,Steam
+  - DOMAIN-SUFFIX,steamcontent.com,Steam
+  - DOMAIN-SUFFIX,steamusercontent.com,Steam
+  - DOMAIN-SUFFIX,steamgames.com,Steam
+  - DOMAIN-SUFFIX,steamserver.net,Steam
+  - DOMAIN-SUFFIX,paypal.com,PayPal
+  - DOMAIN-SUFFIX,paypalobjects.com,PayPal
+  - DOMAIN-SUFFIX,paypal.me,PayPal
+  - DOMAIN-SUFFIX,braintreegateway.com,PayPal
+  - DOMAIN-SUFFIX,microsoft.com,Microsoft
+  - DOMAIN-SUFFIX,microsoftonline.com,Microsoft
+  - DOMAIN-SUFFIX,microsoft365.com,Microsoft
+  - DOMAIN-SUFFIX,office.com,Microsoft
+  - DOMAIN-SUFFIX,office.net,Microsoft
+  - DOMAIN-SUFFIX,office365.com,Microsoft
+  - DOMAIN-SUFFIX,live.com,Microsoft
+  - DOMAIN-SUFFIX,outlook.com,Microsoft
+  - DOMAIN-SUFFIX,onedrive.com,Microsoft
+  - DOMAIN-SUFFIX,sharepoint.com,Microsoft
+  - DOMAIN-SUFFIX,windows.com,Microsoft
+  - DOMAIN-SUFFIX,windowsupdate.com,Microsoft
+  - DOMAIN-SUFFIX,xbox.com,Microsoft
+  - DOMAIN-SUFFIX,xboxlive.com,Microsoft
+  - DOMAIN-SUFFIX,cloud.microsoft,Microsoft
+  - DOMAIN-SUFFIX,azure.com,Microsoft
+  - DOMAIN-SUFFIX,google.com,Google
+  - DOMAIN-SUFFIX,google.com.hk,Google
+  - DOMAIN-SUFFIX,google.co.jp,Google
+  - DOMAIN-SUFFIX,google.com.sg,Google
+  - DOMAIN-SUFFIX,google.com.tw,Google
+  - DOMAIN-SUFFIX,google.com.au,Google
+  - DOMAIN-SUFFIX,google.co.uk,Google
+  - DOMAIN-SUFFIX,google.de,Google
+  - DOMAIN-SUFFIX,google.ca,Google
+  - DOMAIN-SUFFIX,googleapis.com,Google
+  - DOMAIN-SUFFIX,gstatic.com,Google
+  - DOMAIN-SUFFIX,googleusercontent.com,Google
+  - DOMAIN-SUFFIX,googleadservices.com,Google
+  - DOMAIN-SUFFIX,googleblog.com,Google
+  - DOMAIN-SUFFIX,gmail.com,Google
+  - DOMAIN-SUFFIX,gvt1.com,Google
+  - DOMAIN-SUFFIX,gvt2.com,Google
+  - DOMAIN-SUFFIX,google.cn,Google
+  - DOMAIN-SUFFIX,g.co,Google
+  - DOMAIN-SUFFIX,weixin.qq.com,微信
+  - DOMAIN-SUFFIX,wx.qq.com,微信
+  - DOMAIN-SUFFIX,wechat.com,微信
+  - DOMAIN-SUFFIX,weixin.com,微信
+  - DOMAIN-SUFFIX,wechatpay.cn,微信
+  - DOMAIN-SUFFIX,weixinbridge.com,微信
+  - DOMAIN-SUFFIX,weixin110.qq.com,微信
+  - DOMAIN-SUFFIX,servicewechat.com,微信
+  - DOMAIN-SUFFIX,tenpay.com,微信
+  - DOMAIN-SUFFIX,v.qq.com,腾讯视频
+  - DOMAIN-SUFFIX,video.qq.com,腾讯视频
+  - DOMAIN-SUFFIX,film.qq.com,腾讯视频
+  - DOMAIN-SUFFIX,v.smtcdns.com,腾讯视频
+  - DOMAIN-SUFFIX,video.gtimg.com,腾讯视频
+  - DOMAIN-SUFFIX,wetv.vip,腾讯视频
+  - DOMAIN-SUFFIX,qq.com,QQ
+  - DOMAIN-SUFFIX,qpic.cn,QQ
+  - DOMAIN-SUFFIX,qlogo.cn,QQ
+  - DOMAIN-SUFFIX,gtimg.com,QQ
+  - DOMAIN-SUFFIX,idqqimg.com,QQ
+  - DOMAIN-SUFFIX,qqmail.com,QQ
+  - DOMAIN-SUFFIX,qzone.com,QQ
+  - DOMAIN-SUFFIX,tencent.com,腾讯其他
+  - DOMAIN-SUFFIX,tencent-cloud.net,腾讯其他
+  - DOMAIN-SUFFIX,qcloud.com,腾讯其他
+  - DOMAIN-SUFFIX,myqcloud.com,腾讯其他
+  - DOMAIN-SUFFIX,alipay.com,支付宝
+  - DOMAIN-SUFFIX,alipay.cn,支付宝
+  - DOMAIN-SUFFIX,alipayobjects.com,支付宝
+  - DOMAIN-SUFFIX,alipaydns.com,支付宝
+  - DOMAIN-SUFFIX,antgroup.com,支付宝
+  - DOMAIN-SUFFIX,taobao.com,淘宝
+  - DOMAIN-SUFFIX,tmall.com,淘宝
+  - DOMAIN-SUFFIX,tmall.hk,淘宝
+  - DOMAIN-SUFFIX,taobaocdn.com,淘宝
+  - DOMAIN-SUFFIX,tbcdn.cn,淘宝
+  - DOMAIN-SUFFIX,mmstat.com,淘宝
+  - DOMAIN-SUFFIX,alicdn.com,淘宝
+  - DOMAIN-SUFFIX,jd.com,京东
+  - DOMAIN-SUFFIX,jd.hk,京东
+  - DOMAIN-SUFFIX,360buy.com,京东
+  - DOMAIN-SUFFIX,360buyimg.com,京东
+  - DOMAIN-SUFFIX,jdcdn.com,京东
+  - DOMAIN-SUFFIX,jdpay.com,京东
+  - DOMAIN-SUFFIX,jingdong.com,京东
+  - DOMAIN-SUFFIX,pinduoduo.com,拼多多
+  - DOMAIN-SUFFIX,yangkeduo.com,拼多多
+  - DOMAIN-SUFFIX,pddpic.com,拼多多
+  - DOMAIN,lf3-static.bytednsdoc.com,抖音
+  - DOMAIN,v5-dy-o-abtest.zjcdn.com,抖音
+  - DOMAIN-SUFFIX,amemv.com,抖音
+  - DOMAIN-SUFFIX,amemv.net,抖音
+  - DOMAIN-SUFFIX,amemv.cn,抖音
+  - DOMAIN-SUFFIX,douyinstatic.com,抖音
+  - DOMAIN-SUFFIX,idouyinpic.com,抖音
+  - DOMAIN-SUFFIX,idouyinstatic.com,抖音
+  - DOMAIN-SUFFIX,idouyinvod.com,抖音
+  - DOMAIN-SUFFIX,iesdouyin.net,抖音
+  - DOMAIN-SUFFIX,pstatp.com,抖音
+  - DOMAIN-SUFFIX,zijieapi.com,抖音
+  - DOMAIN-SUFFIX,zijieimg.com,抖音
+  - DOMAIN-SUFFIX,douyin.com,抖音
+  - DOMAIN-SUFFIX,douyinpic.com,抖音
+  - DOMAIN-SUFFIX,douyinvod.com,抖音
+  - DOMAIN-SUFFIX,douyincdn.com,抖音
+  - DOMAIN-SUFFIX,iesdouyin.com,抖音
+  - DOMAIN-SUFFIX,snssdk.com,抖音
+  - DOMAIN-SUFFIX,bytedance.com,抖音
+  - DOMAIN-SUFFIX,byteimg.com,抖音
+  - DOMAIN-SUFFIX,bytegoofy.com,抖音
+  - DOMAIN-SUFFIX,kuaishou.com,快手
+  - DOMAIN-SUFFIX,gifshow.com,快手
+  - DOMAIN-SUFFIX,ksapisrv.com,快手
+  - DOMAIN-SUFFIX,kwaicdn.com,快手
+  - DOMAIN-SUFFIX,kuaishouzt.com,快手
+  - DOMAIN-SUFFIX,ksyuncdn.com,快手
+  - DOMAIN-SUFFIX,bilibili.com,哔哩哔哩
+  - DOMAIN-SUFFIX,bilibili.cn,哔哩哔哩
+  - DOMAIN-SUFFIX,bilivideo.com,哔哩哔哩
+  - DOMAIN-SUFFIX,bilivideo.cn,哔哩哔哩
+  - DOMAIN-SUFFIX,hdslb.com,哔哩哔哩
+  - DOMAIN-SUFFIX,bilibili.tv,哔哩哔哩
+  - DOMAIN-SUFFIX,b23.tv,哔哩哔哩
+  - DOMAIN-SUFFIX,xiaohongshu.com,小红书
+  - DOMAIN-SUFFIX,xhscdn.com,小红书
+  - DOMAIN-SUFFIX,xhslink.com,小红书
+  - DOMAIN-SUFFIX,xiaohongshu.net,小红书
+  - DOMAIN-SUFFIX,weibo.com,微博
+  - DOMAIN-SUFFIX,weibo.cn,微博
+  - DOMAIN-SUFFIX,weibocdn.com,微博
+  - DOMAIN-SUFFIX,sinaimg.cn,微博
+  - DOMAIN-SUFFIX,sinaimg.com,微博
+  - DOMAIN-SUFFIX,sina.com.cn,微博
+  - DOMAIN-SUFFIX,zhihu.com,知乎
+  - DOMAIN-SUFFIX,zhimg.com,知乎
+  - DOMAIN-SUFFIX,baidu.com,百度
+  - DOMAIN-SUFFIX,bdstatic.com,百度
+  - DOMAIN-SUFFIX,bdimg.com,百度
+  - DOMAIN-SUFFIX,baidubce.com,百度
+  - DOMAIN-SUFFIX,baidupcs.com,百度
+  - DOMAIN-SUFFIX,hao123.com,百度
+  - DOMAIN-SUFFIX,163.com,网易
+  - DOMAIN-SUFFIX,126.com,网易
+  - DOMAIN-SUFFIX,127.net,网易
+  - DOMAIN-SUFFIX,netease.com,网易
+  - DOMAIN-SUFFIX,163yun.com,网易
+  - DOMAIN-SUFFIX,126.net,网易
+  - DOMAIN-SUFFIX,iqiyi.com,爱奇艺
+  - DOMAIN-SUFFIX,qiyi.com,爱奇艺
+  - DOMAIN-SUFFIX,qiyipic.com,爱奇艺
+  - DOMAIN-SUFFIX,iqiyipic.com,爱奇艺
+  - DOMAIN-SUFFIX,iq.com,爱奇艺
+  - DOMAIN-SUFFIX,youku.com,优酷
+  - DOMAIN-SUFFIX,tudou.com,优酷
+  - DOMAIN-SUFFIX,youku.tv,优酷
+  - DOMAIN-SUFFIX,ykimg.com,优酷
+  - DOMAIN-SUFFIX,mgtv.com,芒果 TV
+  - DOMAIN-SUFFIX,hunantv.com,芒果 TV
+  - DOMAIN-SUFFIX,hitv.com,芒果 TV
+  - DOMAIN-SUFFIX,amap.com,高德地图
+  - DOMAIN-SUFFIX,autonavi.com,高德地图
+  - DOMAIN-SUFFIX,gaode.com,高德地图
+  - DOMAIN-SUFFIX,meituan.com,美团
+  - DOMAIN-SUFFIX,meituan.net,美团
+  - DOMAIN-SUFFIX,dianping.com,美团
+  - DOMAIN-SUFFIX,dpfile.com,美团
+  - DOMAIN-SUFFIX,meituanwaimai.com,美团
+  - DOMAIN-SUFFIX,didiglobal.com,滴滴
+  - DOMAIN-SUFFIX,didichuxing.com,滴滴
+  - DOMAIN-SUFFIX,didistatic.com,滴滴
+  - DOMAIN-SUFFIX,xiaojukeji.com,滴滴
+  - DOMAIN-SUFFIX,diditaxi.com.cn,滴滴
+  - DOMAIN-SUFFIX,icbc.com.cn,国内银行
+  - DOMAIN-SUFFIX,ccb.com,国内银行
+  - DOMAIN-SUFFIX,abchina.com,国内银行
+  - DOMAIN-SUFFIX,bocom.com,国内银行
+  - DOMAIN-SUFFIX,bankcomm.com,国内银行
+  - DOMAIN-SUFFIX,boc.cn,国内银行
+  - DOMAIN-SUFFIX,cmbchina.com,国内银行
+  - DOMAIN-SUFFIX,cgbchina.com.cn,国内银行
+  - DOMAIN-SUFFIX,spdb.com.cn,国内银行
+  - DOMAIN-SUFFIX,psbc.com,国内银行
+  - DOMAIN-SUFFIX,pingan.com,国内银行
+  - DOMAIN-SUFFIX,cmbc.com.cn,国内银行
+  - DOMAIN-SUFFIX,unionpay.com,国内银行
+  - DOMAIN-SUFFIX,95516.com,国内银行
+  - DOMAIN-SUFFIX,bytegecko.com,DIRECT
+  - DOMAIN-SUFFIX,toutiaoapi.com,DIRECT
+  - DOMAIN-SUFFIX,cn,中国大陆
+  - GEOIP,CN,DIRECT
+  - MATCH,Final
